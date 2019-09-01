@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
     <FileVersion>3.0.0</FileVersion>
@@ -71,7 +72,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.IO.Pipelines" Version="4.6.0-preview6.19303.8" />
+    <PackageReference Include="System.IO.Pipelines" Version="4.6.0-preview8.19405.3" />
+    <PackageReference Include="ILRepack.MSBuild.Task" Version="2.0.13" PrivateAssets="All"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -90,5 +92,28 @@
   </ItemGroup>
 
   <Import Project="Asn1\AsnXml.targets" Condition="'$(Generate)' == 'true'" />
+
+  <Target Name="ILRepack" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <PropertyGroup>
+      <WorkingDirectory>$(MSBuildThisFileDirectory)bin\$(Configuration)\$(TargetFrameworks)</WorkingDirectory>
+    </PropertyGroup>
+    <ItemGroup>
+      <InputAssemblies Include="System.IO.Pipelines.dll" />
+      <InputAssemblies Include="System.Buffers.dll" />
+      <InputAssemblies Include="System.Buffers.dll" />
+      <InputAssemblies Include="System.Memory.dll" />
+      <InputAssemblies Include="System.Numerics.Vectors.dll" />
+      <InputAssemblies Include="System.Runtime.CompilerServices.Unsafe.dll" />
+      <InputAssemblies Include="System.Threading.Tasks.Extensions.dll" />
+    </ItemGroup>
+    <Message Text="MERGING: @(InputAssemblies->'%(Filename)') into $(OutputAssembly)" Importance="High" />
+    <ILRepack
+      OutputType="$(OutputType)"
+      MainAssembly="$(AssemblyName).dll"
+      OutputAssembly="$(AssemblyName).dll"
+      InputAssemblies="@(InputAssemblies)"
+      InternalizeExcludeAssemblies="@(InternalizeExcludeAssemblies)"
+      WorkingDirectory="$(WorkingDirectory)" />
+  </Target>
 
 </Project>

@@ -18,7 +18,7 @@ namespace Kerberos.NET.Transport
         public UdpKerberosTransport(string kdc = null)
             : base(kdc)
         {
-            Enabled = false;
+            Enabled = true;
         }
 
         public override async Task<T> SendMessage<T>(string domain, ReadOnlyMemory<byte> encoded)
